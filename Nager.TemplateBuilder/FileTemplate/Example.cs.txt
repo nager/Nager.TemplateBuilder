@@ -1,0 +1,18 @@
+﻿using System;
+using System.Windows.Forms;
+
+namespace ##projectname##
+{
+    public class Example
+    {
+        public void GetData()
+        {
+            using (var client = new Client("net.tcp://localhost:32035", new BindingFactory().NetTcpBinding()))
+            {
+                client.Connect(false, true);
+                var result = client.GetData();
+				MessageBox.Show(result.Data.Count.ToString());
+            }
+        }
+    }
+}

@@ -1,0 +1,35 @@
+﻿using System;
+using System.ServiceModel;
+using System.Xml;
+
+namespace ##projectname##.Factory
+{
+    public class BindingFactory
+    {
+        public NetTcpBinding NetTcpBinding(SecurityMode securityMode = SecurityMode.None)
+        {
+            var readerQuotas = new XmlDictionaryReaderQuotas()
+            {
+                MaxStringContentLength = 67108864, //64MB //Default:8192
+                MaxArrayLength = 67108864, //64MB //Default:16384
+                MaxBytesPerRead = 67108864, //64MB //Default:4096
+                MaxDepth = 100, //Default:32
+                MaxNameTableCharCount = 32384 //Default: 16384
+            };
+
+            var binding = new NetTcpBinding(securityMode)
+            {
+                OpenTimeout = new TimeSpan(0, 0, 10),
+                CloseTimeout = new TimeSpan(0, 0, 10),
+                ReceiveTimeout = new TimeSpan(0, 1, 0),
+                SendTimeout = new TimeSpan(0, 1, 0),
+                MaxBufferPoolSize = 209715200, //200MB
+                MaxBufferSize = 52428800, //50MB
+                MaxReceivedMessageSize = 52428800, //50MB
+                ReaderQuotas = readerQuotas,
+            };
+
+            return binding;
+        }
+    }
+}

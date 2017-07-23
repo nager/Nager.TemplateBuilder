@@ -1,0 +1,55 @@
+﻿using log4net;
+using System;
+using System.Collections.Concurrent;
+using System.Configuration;
+using System.IO;
+using System.ServiceModel;
+using ##projectname##.WCF;
+
+namespace ##projectname##.Core
+{
+    public class SystemCore
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SystemCore));
+		private ServiceHost _serviceHost;
+
+        #region Singelton
+        private static readonly Lazy<SystemCore> _instance = new Lazy<SystemCore>(() => new SystemCore());
+
+        // private to prevent direct instantiation.
+        private SystemCore()
+        {
+
+        }
+
+        // accessor for instance
+        public static SystemCore Instance
+        {
+            get
+            {
+                return _instance.Value;
+            }
+        }
+        #endregion
+
+        #region Common
+
+        public bool Start()
+        {
+		    this._serviceHost = new ServiceHost(typeof(CommunicationService));
+            this._serviceHost.AddServiceEndpoint(typeof(ICommunicationService), new BindingFactory().NetTcpBinding(), "net.tcp://localhost:32035");
+            this._serviceHost.Open();
+
+            return true;
+        }
+
+        public bool Stop()
+        {
+			this._serviceHost.Close(new TimeSpan(0, 0, 1));
+
+            return true;
+        }
+
+        #endregion
+    }
+}

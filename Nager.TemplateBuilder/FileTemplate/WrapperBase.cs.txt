@@ -1,0 +1,202 @@
+﻿using System;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ##projectname##.WCF
+{
+    public abstract class WrapperBase<TChannel> : IDisposable
+    {
+        protected string _endpointAddress;
+        protected Binding _binding;
+        protected IClientChannel _channel;
+        protected bool _closeChannel;
+        protected ManualResetEvent _waitToConnected = new ManualResetEvent(false);
+        private AutoResetEvent _heartbeatResetEvent = new AutoResetEvent(false);
+        private CommunicationState _communicationState;
+        public event Action<CommunicationState> OnCommunicationStateChanged;
+
+        public WrapperBase(string endpointAddress, Binding binding)
+        {
+            this.ChangeCommunicationState(CommunicationState.Created);
+            this._closeChannel = false;
+            this._endpointAddress = endpointAddress;
+            this._binding = binding;
+        }
+
+        public bool Connect(bool persistent = false, bool waitToConnected = false)
+        {
+            if (persistent)
+            {
+                this.StartHeartbeat();
+
+                if (waitToConnected)
+                {
+                    this._waitToConnected.WaitOne();
+                }
+
+                return true;
+            }
+
+            return this.CreateChannel();
+        }
+
+        private void ChangeCommunicationState(CommunicationState communicationState)
+        {
+            if (this._communicationState == communicationState)
+            {
+                return;
+            }
+
+            this._communicationState = communicationState;
+            this.OnCommunicationStateChanged?.Invoke(CommunicationState);
+        }
+
+        public TChannel Channel
+        {
+            get
+            {
+                return (TChannel)this._channel;
+            }
+        }
+
+        public CommunicationState CommunicationState
+        {
+            get
+            {
+                return this._communicationState;
+            }
+        }
+
+        protected void StartHeartbeat()
+        {
+            Task.Run(() => { this.HeartbeatProcess().Wait(); });
+        }
+
+        protected async Task HeartbeatProcess()
+        {
+            while (!this._closeChannel)
+            {
+                if (this._channel == null)
+                {
+                    if (!this.CreateChannel())
+                    {
+                        await Task.Delay(2000);
+                        continue;
+                    }
+                    this._waitToConnected.Set();
+                    continue;
+                }
+
+                if (this._channel.State != CommunicationState.Opened)
+                {
+                    this.DisposeService();
+                    await Task.Delay(2000);
+                    continue;
+                }
+
+                var pingState = this.Ping();
+                if (pingState)
+                {
+                    this._heartbeatResetEvent.WaitOne(5000);
+                }
+                else
+                {
+                    this._channel.Abort();
+                    this.ChangeCommunicationState(CommunicationState.Faulted);
+                }
+            }
+        }
+
+        protected abstract TChannel GetChannel();
+
+        protected bool CreateChannel()
+        {
+            if (this._closeChannel)
+            {
+                return true;
+            }
+
+            try
+            {
+                this.ChangeCommunicationState(CommunicationState.Opening);
+                var channel = this.GetChannel();
+                this._channel = channel as IClientChannel;
+                this._channel.Faulted += this.ClientChannelFaulted;
+                this._channel.Open();
+                this.ChangeCommunicationState(CommunicationState.Opened);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                this._channel.Faulted -= this.ClientChannelFaulted;
+                this.ChangeCommunicationState(CommunicationState.Faulted);
+            }
+
+            return false;
+        }
+
+        private void ClientChannelFaulted(object sender, EventArgs e)
+        {
+            this.ChangeCommunicationState(CommunicationState.Faulted);
+        }
+
+        #region Override Methods
+
+        public virtual bool Ping()
+        {
+            return true;
+        }
+
+        #endregion
+
+        #region Dispose
+
+        public void Dispose()
+        {
+            this._closeChannel = true;
+            this._heartbeatResetEvent.Set();
+            this.DisposeService();
+            GC.SuppressFinalize(this);
+        }
+
+        protected void DisposeService()
+        {
+            var success = false;
+            this.ChangeCommunicationState(CommunicationState.Closing);
+
+            if (this._channel == null)
+            {
+                this.ChangeCommunicationState(CommunicationState.Closed);
+                return;
+            }
+
+            try
+            {
+                //Remove Event
+                this._channel.Faulted -= this.ClientChannelFaulted;
+
+                if (this._channel.State != CommunicationState.Faulted)
+                {
+                    this._channel.Close(new TimeSpan(0, 0, 5));
+                    success = true;
+                }
+            }
+            catch (Exception)
+            { }
+            finally
+            {
+                if (!success)
+                {
+                    this._channel.Abort();
+                }
+            }
+            this.ChangeCommunicationState(CommunicationState.Closed);
+            this._channel = null;
+        }
+
+        #endregion
+    }
+}

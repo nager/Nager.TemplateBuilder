@@ -1,0 +1,11 @@
+﻿namespace ##projectname##.Model
+{
+    public enum RequestStatus
+    {
+        Successful = 1,
+        TemporaryError = 2,
+        PermanentError = 3,
+        UnknownError = 4,
+        NotFound = 5,
+    }
+}

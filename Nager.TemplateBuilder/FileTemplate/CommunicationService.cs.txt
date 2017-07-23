@@ -1,0 +1,20 @@
+﻿using log4net;
+using System.Collections.Generic;
+
+namespace ##projectname##.WCF
+{
+    public class CommunicationService : ICommunicationService
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(CommunicationService));
+
+        public void Ping()
+        {
+            Log.Debug(nameof(Ping));
+        }
+
+        public RequestResult<List<string>> GetData()
+        {
+            return new RequestResult<List<string>> { Data = new List<string>() { "test" } };
+        }
+    }
+}

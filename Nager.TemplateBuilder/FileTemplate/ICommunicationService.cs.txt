@@ -1,0 +1,16 @@
+﻿using ##projectname##.Model;
+using System.Collections.Generic;
+using System.ServiceModel;
+
+namespace ##projectname##.WCF
+{
+    [ServiceContract]
+    public interface ICommunicationService
+    {
+        [OperationContract]
+        void Ping();
+
+        [OperationContract]
+        RequestResult<List<string>> GetData();
+    }
+}

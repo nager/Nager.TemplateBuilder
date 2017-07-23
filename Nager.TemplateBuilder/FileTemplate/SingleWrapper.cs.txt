@@ -1,0 +1,18 @@
+﻿using System.ServiceModel;
+using System.ServiceModel.Channels;
+
+namespace ##projectname##.WCF
+{
+    public class SingleWrapper<TChannel> : WrapperBase<TChannel>
+        where TChannel : class
+    {
+        public SingleWrapper(string endpointAddress, Binding binding) : base(endpointAddress, binding)
+        { }
+
+        protected override TChannel GetChannel()
+        {
+            var factory = new ChannelFactory<TChannel>(base._binding, new EndpointAddress(base._endpointAddress));
+            return factory.CreateChannel();
+        }
+    }
+}

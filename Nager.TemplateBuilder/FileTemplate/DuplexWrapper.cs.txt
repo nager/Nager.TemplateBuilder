@@ -1,0 +1,32 @@
+﻿using System.ServiceModel;
+using System.ServiceModel.Channels;
+
+namespace ##projectname##.WCF
+{
+    public class DuplexWrapper<TChannel, TCallback> : WrapperBase<TChannel>
+             where TChannel : class
+             where TCallback : new()
+    {
+        private TCallback _callback;
+
+        public DuplexWrapper(string endpointAddress, Binding binding) : base(endpointAddress, binding)
+        {
+            this._callback = new TCallback();
+        }
+
+        public TCallback Callback
+        {
+            get
+            {
+                return this._callback;
+            }
+        }
+
+        protected override TChannel GetChannel()
+        {
+            var instanceContext = new InstanceContext(this._callback);
+            var factory = new DuplexChannelFactory<TChannel>(instanceContext, base._binding, new EndpointAddress(base._endpointAddress));
+            return factory.CreateChannel();
+        }
+    }
+}

@@ -1,0 +1,50 @@
+﻿using log4net;
+using ##projectname##.Model;
+using System;
+using System.Collections.Generic;
+using System.ServiceModel.Channels;
+
+namespace ##projectname##.WCF
+{
+    public class Client : SingleWrapper<ICommunicationService>
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Client));
+
+        public Client(string endpointAddress, Binding binding)
+            : base(endpointAddress, binding)
+        {
+            Log.Debug("Client - Initialize");
+        }
+
+        #region Override Methods
+
+        public override bool Ping()
+        {
+            try
+            {
+                this.Channel.Ping();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Log.Error("Ping", exception);
+                return false;
+            }
+        }
+
+        #endregion
+
+        public RequestResult<List<string>> GetData()
+        {
+            try
+            {
+                return this.Channel.GetData();
+            }
+            catch (Exception exception)
+            {
+                Log.Error(nameof(GetData), exception);
+                return new RequestResult<List<string>> { Status = RequestStatus.UnknownError };
+            }
+        }
+    }
+}

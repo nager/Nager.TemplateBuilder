@@ -1,0 +1,25 @@
+﻿namespace ##projectname##.Model
+{
+    public class RequestResult
+    {
+        public RequestStatus Status { get; set; }
+        public string Message { get; set; }
+
+        public RequestResult()
+        {
+            this.Status = RequestStatus.Successful;
+        }
+    }
+
+    public class RequestResult<T>
+    {
+        public RequestStatus Status { get; set; }
+        public string Message { get; set; }
+        public T Data { get; set; }
+
+        public RequestResult()
+        {
+            this.Status = RequestStatus.Successful;
+        }
+    }
+}

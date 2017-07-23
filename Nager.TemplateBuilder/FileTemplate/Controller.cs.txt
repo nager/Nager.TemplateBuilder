@@ -1,0 +1,22 @@
+﻿using ##projectname##.Core;
+using log4net;
+
+namespace ##projectname##
+{
+    public class Controller
+    {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Controller));
+
+        public bool Start()
+        {
+            Log.Debug("Start");
+            return SystemCore.Instance.Start();
+        }
+
+        public bool Stop()
+        {
+            Log.Debug("Stop");
+            return SystemCore.Instance.Stop();
+        }
+    }
+}
