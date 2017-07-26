@@ -13,7 +13,7 @@ namespace Nager.TemplateBuilder.Model
         public List<ProjectFile> Files { get; set; }
         public List<ProjectFile> RemoveFiles { get; set; }
         public Version DotNetFrameworkVersion { get; set; }
-        public List<string> ChangeFile { get; set; }
+        public List<ChangeFile> ChangeFile { get; set; }
 
         public ProjectInfo(string name, ProjectTemplate template)
         {

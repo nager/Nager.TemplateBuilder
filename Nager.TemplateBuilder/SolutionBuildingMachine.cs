@@ -229,7 +229,7 @@ namespace Nager.TemplateBuilder
 
             //if (currentVersion.(".NETFramework,Version=v4.5"))
             //{
-                
+
             //}
         }
 
@@ -382,16 +382,68 @@ namespace Nager.TemplateBuilder
             }
 
             var project = this.GetProject(projectInfo.Name);
-            var path = Path.GetDirectoryName(project.FullName);
 
             foreach (var file in projectInfo.ChangeFile)
             {
-                using (var streamwriter = File.AppendText(Path.Combine(path, @"Properties\AssemblyInfo.cs")))
+                var projectItems = project.ProjectItems;
+
+                if (!String.IsNullOrEmpty(file.Folder))
                 {
-                    streamwriter.WriteLine(file);
-                    streamwriter.Flush();
-                    streamwriter.Close();
+                    for (var i = 1; i <= project.ProjectItems.Count; i++)
+                    {
+                        var item = project.ProjectItems.Item(i);
+                        if (item.Name == file.Folder)
+                        {
+                            projectItems = item.ProjectItems;
+                            break;
+                        }
+                    }
                 }
+
+                switch (file.Operation)
+                {
+                    case ChangeFileOperation.Add:
+                        var changeFileAdd = file as ChangeFileAdd;
+                        this.ChangeFileAdd(projectItems, changeFileAdd);
+                        break;
+                    case ChangeFileOperation.Remove:
+                        var changeFileRemove = file as ChangeFileRemove;
+                        Log.Debug($"{nameof(ChangeFile)} - Operation remove not supported");
+                        break;
+                    case ChangeFileOperation.Replace:
+                        var changeFileReplace = file as ChangeFileReplace;
+                        Log.Debug($"{nameof(ChangeFile)} - Operation replace not supported");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void ChangeFileAdd(ProjectItems projectItems, ChangeFileAdd changeFile)
+        {
+            for (var i = 1; i <= projectItems.Count; i++)
+            {
+                var item = projectItems.Item(i);
+                if (item.Name != changeFile.Name)
+                {
+                    continue;
+                }
+
+                var path = item.Properties.Item("FullPath").Value;
+
+                if (changeFile.EndOfFile == true)
+                {
+                    using (var streamwriter = File.AppendText(path))
+                    {
+                        streamwriter.WriteLine(changeFile.Data);
+                        streamwriter.Flush();
+                        streamwriter.Close();
+                    }
+                    continue;
+                }
+
+                Log.Debug($"{nameof(ChangeFileAdd)} - Operation not supported");
             }
         }
 
@@ -483,17 +535,24 @@ namespace Nager.TemplateBuilder
                 return false;
             }
 
-            using (var file = File.Open($@"{path}\packages.config", FileMode.Open, FileAccess.Read))
+            try
             {
-                var data = new byte[file.Length];
-                file.Read(data, 0, (int)file.Length);
-                file.Close();
-
-                var result = Encoding.UTF8.GetString(data);
-                if (result.Contains(nugetPackage))
+                using (var file = File.Open($@"{path}\packages.config", FileMode.Open, FileAccess.Read))
                 {
-                    return true;
+                    var data = new byte[file.Length];
+                    file.Read(data, 0, (int)file.Length);
+                    file.Close();
+
+                    var result = Encoding.UTF8.GetString(data);
+                    if (result.Contains(nugetPackage))
+                    {
+                        return true;
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                Log.Debug(nameof(IsPackageInstalled), exception);
             }
 
             return false;

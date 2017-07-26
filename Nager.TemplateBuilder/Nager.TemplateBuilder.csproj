@@ -105,6 +105,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="MessageFilter.cs" />
+    <Compile Include="Model\ChangeFileAdd.cs" />
+    <Compile Include="Model\ChangeFile.cs" />
+    <Compile Include="Model\ChangeFileOperation.cs" />
+    <Compile Include="Model\ChangeFileRemove.cs" />
+    <Compile Include="Model\ChangeFileReplace.cs" />
     <Compile Include="Model\ProjectFile.cs" />
     <Compile Include="Model\ProjectInfo.cs" />
     <Compile Include="Model\SolutionInfo.cs" />

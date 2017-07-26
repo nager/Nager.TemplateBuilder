@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Nager.TemplateBuilder.Model;
+using log4net;
 
 namespace Nager.TemplateBuilder
 {
     class Program
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Program));
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -40,7 +43,7 @@ namespace Nager.TemplateBuilder
             libraryProject.Files.Add(new ProjectFile("Controller.cs"));
             libraryProject.Files.Add(new ProjectFile("SystemCore.cs", "Core") { AddNamespaces = new List<string> { $"{solutionName}.Common.WCF", $"{solutionName}.Common.Factory" } });
             libraryProject.Files.Add(new ProjectFile("CommunicationService.cs", "WCF") { AddNamespaces = new List<string> { $"{solutionName}.Common.Model", $"{solutionName}.Common.WCF" } });
-            libraryProject.ChangeFile = new List<string> { "[assembly: log4net.Config.XmlConfigurator(ConfigFile = \"log4net.config\", Watch = true)]" };
+            libraryProject.ChangeFile = new List<ChangeFile> { new ChangeFileAdd("AssemblyInfo.cs", "Properties", "[assembly: log4net.Config.XmlConfigurator(ConfigFile = \"log4net.config\", Watch = true)]") };
 
             var serviceProject = new ProjectInfo($"{solutionName}.Service", ProjectTemplate.WindowsClassicDesktopConsoleApp);
             serviceProject.RemoveFiles = new List<ProjectFile> { new ProjectFile("Program.cs") };
@@ -67,9 +70,10 @@ namespace Nager.TemplateBuilder
             buildingMachine.Build(solutionInfo);
             buildingMachine.Dispose();
 
-            Console.WriteLine("-----------------------------------");
-            Console.WriteLine("         Solution created");
-            Console.WriteLine("-----------------------------------");
+            Log.Info("#########################################################");
+            Log.Info("#                   Solution created                    #");
+            Log.Info("#                 Press any key for quit                #");
+            Log.Info("#########################################################");
             Console.ReadLine();
         }
     }
