@@ -10,6 +10,12 @@ Create automated Visual Studio Solutions and Projects
 - [x] Add Files
 - [x] Choose Framework Version
 
+### nuget
+The package is available on [nuget](https://www.nuget.org/packages/Nager.TemplateBuilder)
+```
+PM> install-package Nager.TemplateBuilder
+```
+
 ##### Example
 ```cs
 
