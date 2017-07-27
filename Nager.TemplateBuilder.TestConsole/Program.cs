@@ -2,9 +2,6 @@
 using Nager.TemplateBuilder.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nager.TemplateBuilder.TestConsole
 {
@@ -69,7 +66,7 @@ namespace Nager.TemplateBuilder.TestConsole
             solutionInfo.ProjectInfos.Add(serviceProject);
             solutionInfo.ProjectInfos.Add(testUiProject);
 
-            var buildingMachine = new SolutionBuildingMachine("FileTemplate1");
+            var buildingMachine = new SolutionBuildingMachine("FileTemplate");
             buildingMachine.Build(solutionInfo);
             buildingMachine.Dispose();
 
