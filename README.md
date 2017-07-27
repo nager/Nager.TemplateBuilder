@@ -48,7 +48,7 @@ libraryProject.Files = new List<ProjectFile>();
 libraryProject.Files.Add(new ProjectFile("Controller.cs"));
 libraryProject.Files.Add(new ProjectFile("SystemCore.cs", "Core") { AddNamespaces = new List<string> { $"{solutionName}.Common.WCF", $"{solutionName}.Common.Factory" } });
 libraryProject.Files.Add(new ProjectFile("CommunicationService.cs", "WCF") { AddNamespaces = new List<string> { $"{solutionName}.Common.Model", $"{solutionName}.Common.WCF" } });
-libraryProject.ChangeFile = new List<string> { "[assembly: log4net.Config.XmlConfigurator(ConfigFile = \"log4net.config\", Watch = true)]" };
+libraryProject.ChangeFile = new List<ChangeFile> { new ChangeFileAdd("AssemblyInfo.cs", "Properties", "[assembly: log4net.Config.XmlConfigurator(ConfigFile = \"log4net.config\", Watch = true)]") };
 
 //Configure "Service" project
 var serviceProject = new ProjectInfo($"{solutionName}.Service", ProjectTemplate.WindowsClassicDesktopConsoleApp);
