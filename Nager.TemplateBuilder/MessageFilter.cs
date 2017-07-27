@@ -8,6 +8,10 @@ namespace Nager.TemplateBuilder
         // Class containing the IOleMessageFilter
         // thread error-handling functions.
 
+        // Implement the IOleMessageFilter interface.
+        [DllImport("Ole32.dll")]
+        private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
+
         // Start the filter.
         public static void Register()
         {
@@ -48,10 +52,6 @@ namespace Nager.TemplateBuilder
             //Return the flag PENDINGMSG_WAITDEFPROCESS.
             return 2;
         }
-
-        // Implement the IOleMessageFilter interface.
-        [DllImport("Ole32.dll")]
-        private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
     }
 
     [ComImport, Guid("00000016-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
