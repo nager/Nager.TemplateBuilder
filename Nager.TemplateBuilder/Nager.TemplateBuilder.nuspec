@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Nager.TemplateBuilder</id>
+    <version>$version$</version>
+    <authors>Tino Hager</authors>
+    <owners>nager</owners>
+    <licenseUrl>https://github.com/tinohager/Nager.TemplateBuilder/blob/master/Licence.txt</licenseUrl>
+    <projectUrl>https://github.com/tinohager/Nager.TemplateBuilder</projectUrl>
+    <!-- <iconUrl></iconUrl> -->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Automating Solution and Project creation</description>
+    <releaseNotes></releaseNotes>
+    <tags></tags>
+  </metadata>
+</package>

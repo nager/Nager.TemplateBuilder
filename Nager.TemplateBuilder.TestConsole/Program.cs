@@ -1,9 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using log4net;
 using Nager.TemplateBuilder.Model;
-using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Nager.TemplateBuilder
+namespace Nager.TemplateBuilder.TestConsole
 {
     class Program
     {
@@ -66,7 +69,7 @@ namespace Nager.TemplateBuilder
             solutionInfo.ProjectInfos.Add(serviceProject);
             solutionInfo.ProjectInfos.Add(testUiProject);
 
-            var buildingMachine = new SolutionBuildingMachine();
+            var buildingMachine = new SolutionBuildingMachine("FileTemplate1");
             buildingMachine.Build(solutionInfo);
             buildingMachine.Dispose();
 

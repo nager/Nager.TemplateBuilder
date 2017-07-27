@@ -1,12 +1,12 @@
 ﻿using EnvDTE;
 using EnvDTE80;
 using log4net;
+using Nager.TemplateBuilder.Model;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
-using Nager.TemplateBuilder.Model;
 using VSLangProj;
 
 namespace Nager.TemplateBuilder
@@ -15,9 +15,12 @@ namespace Nager.TemplateBuilder
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SolutionBuildingMachine));
         private DTE2 _visualStudioInstance;
+        private string _templateFolder;
 
-        public SolutionBuildingMachine()
+        public SolutionBuildingMachine(string templateFolder = "FileTemplate")
         {
+            this._templateFolder = templateFolder;
+
             var type = Type.GetTypeFromProgID("VisualStudio.DTE.15.0");
             var obj = Activator.CreateInstance(type, true);
             this._visualStudioInstance = (DTE2)obj;
@@ -308,7 +311,7 @@ namespace Nager.TemplateBuilder
 
                 if (this.PrepareFile(file, projectInfo.Name))
                 {
-                    var projectItem = projectItems.AddFromFileCopy(Path.Combine(Environment.CurrentDirectory, "FileTemplate", file.Name));
+                    var projectItem = projectItems.AddFromFileCopy(Path.Combine(Environment.CurrentDirectory, this._templateFolder, file.Name));
 
                     #region CopyToOutputDirectory
 
@@ -336,7 +339,7 @@ namespace Nager.TemplateBuilder
 
         private bool PrepareFile(ProjectFile file, string projectNamespace)
         {
-            var templatePath = $@"FileTemplate\{file.Name}.txt";
+            var templatePath = $@"{this._templateFolder}\{file.Name}.txt";
 
             if (!File.Exists(templatePath))
             {
@@ -369,7 +372,7 @@ namespace Nager.TemplateBuilder
 
             #endregion
 
-            File.WriteAllText($@"FileTemplate\{file.Name}", content);
+            File.WriteAllText($@"{this._templateFolder}\{file.Name}", content);
 
             return true;
         }
